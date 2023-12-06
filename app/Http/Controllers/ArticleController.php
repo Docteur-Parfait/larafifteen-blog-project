@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ArticleController extends Controller
 {
@@ -36,9 +37,14 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article = Article::where("id", $id)->with("categorie")->first();
+        try {
+            $article = Article::findOrFail($id);
 
-        return response()->json($article, 200);
+            return response()->json($article, 200);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json("Aucune donné trouvée", 402);
+        }
     }
 
     /**
@@ -46,6 +52,8 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+
         $article = Article::find($id);
         $article->categorie_id =  $request->json("categorie_id");
         $article->nom =  $request->json("nom");

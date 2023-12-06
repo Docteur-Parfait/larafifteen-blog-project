@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class CategorieController extends Controller
 {
@@ -22,12 +25,32 @@ class CategorieController extends Controller
      */
     public function store(Request $request)
     {
-        $categorie = new Categorie();
-        $categorie->nom =  $request->json("nom");
-        $categorie->description =  $request->json("description");
-        $categorie->save();
+        try {
+            $validator = Validator::make($request->json()->all(), [
+                "nom" => "required|unique:categories,nom",
+                "description" => "required|max:20"
+            ], [
+                "nom.unique" => "Ce nom existe déjà"
+            ]);
 
-        return response()->json($categorie, 200);
+            $validator->validate();
+
+
+            $categorie = new Categorie();
+            $categorie->nom =  $request->json("nom");
+            $categorie->description =  $request->json("description");
+            $categorie->save();
+
+            Log::info("la categorie $categorie->nom a été ajouté avec succès par Parfait");
+
+            return response()->json($categorie, 200);
+        } catch (ValidationException $e) {
+
+            return response()->json($e->validator->errors());
+        } catch (\Exception $e) {
+
+            return response()->json($e);
+        }
     }
 
     /**
