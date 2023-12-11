@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categorie;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -15,9 +16,15 @@ class CategorieController extends Controller
      */
     public function index()
     {
-        $categories = Categorie::with("articles")->get();
+        try {
+            $categories = Categorie::with("articles")->get();
 
-        return response()->json($categories, 200);
+            return response()->json($categories, 200);
+        } catch (Exception $th) {
+            return response()->json([
+                "error" => $th
+            ]);
+        }
     }
 
     /**
@@ -47,7 +54,7 @@ class CategorieController extends Controller
         } catch (ValidationException $e) {
 
             return response()->json($e->validator->errors());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             return response()->json($e);
         }

@@ -6,6 +6,7 @@ use App\Http\Controllers\EleveController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,8 +28,13 @@ Route::delete("categories/{id}", [CategorieController::class, "destroy"]);
 
 
 // Articles
-Route::get("articles", [ArticleController::class, "index"]);
+Route::get("articles", [ArticleController::class, "index"])->middleware("auth:sanctum");
 Route::get("articles/{id}", [ArticleController::class, "show"]);
 Route::put("articles/{id}", [ArticleController::class, "update"]);
 Route::post("articles", [ArticleController::class, "store"]);
 Route::delete("articles/{id}", [ArticleController::class, "destroy"]);
+
+
+// Authenfication
+Route::post("register", [UserController::class, "register"]);
+Route::post("login", [UserController::class, "login"]);
